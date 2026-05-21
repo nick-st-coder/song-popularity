@@ -23,7 +23,6 @@ Thumbs.db
 
 # ML artifacts / outputs
 mlruns/
-outputs/
 models/
 checkpoints/
 
@@ -31,4 +30,5 @@ checkpoints/
 *.log
 
 # Data
-data
+data/external
+data/raw
