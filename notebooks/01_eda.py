@@ -8,8 +8,10 @@ app = marimo.App()
 def _():
     import numpy as np
     import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
 
-    return (pd,)
+    return pd, plt, sns
 
 
 @app.cell
@@ -56,17 +58,39 @@ def _(mo):
     return
 
 
+@app.cell
+def _(high_pop):
+    high_pop.groupby(by='playlist_genre').size().sort_values(ascending=False).head(5) #ty:ignore[no-matching-overload]
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    By executing command below, we see, that the most popular genre is `pop` with significant difference from other genres.
+    We see, that the most popular genre is `pop` with significant difference from other genres.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
     """)
     return
 
 
 @app.cell
 def _(high_pop):
-    high_pop.groupby(by='playlist_genre').size().sort_values(ascending=False).head(5) #ty:ignore[no-matching-overload]
+    high_pop.groupby("playlist_genre")["track_popularity"].mean().sort_values(ascending=False)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    While popular songs are most likely to be `gaming` or `pop`
+    """)
     return
 
 
@@ -128,6 +152,44 @@ def _(high_pop):
 def _(mo):
     mo.md(r"""
     `Left-skewed distribution` - most of the songs popularity parameter is between 65-75
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _():
+    numeric_features = ['energy', 'tempo', 'danceability', 'loudness', 'liveness',
+    'valence', 'speechiness', 'track_popularity', 'instrumentalness']
+    return (numeric_features,)
+
+
+@app.cell
+def _(high_pop, numeric_features, plt, sns):
+    corr = high_pop[numeric_features].corr()
+
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(corr, annot=True, cmap='coolwarm')
+
+    plt.title("Correlation in music")
+    plt.show()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    - Highly `energetic` tracks tend to be loud and positive.
+    - `Instrumental` songs tend to be quiet.
+    - `Loud` music usually not instrumental, danceable, can be performed live, positive and energetic.
+    - `Danceable` music is usually has a lot of lyrics in it, positive and loud.
     """)
     return
 
