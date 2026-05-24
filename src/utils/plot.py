@@ -14,6 +14,9 @@ def show_plot_4x4(scatter: bool, box: bool, y, x1, x2, x3, x4):
         axes[0, 1].set_title("Danceability vs Popularity")
         axes[1, 0].set_title("Loudness vs Popularity")
         axes[1, 1].set_title("Valence vs Popularity")
+        
+        plt.tight_layout()
+        plt.show()
 
     if(box):
         sns.boxplot(x=x1, y=y, ax=axes[0, 0])
@@ -26,5 +29,5 @@ def show_plot_4x4(scatter: bool, box: bool, y, x1, x2, x3, x4):
         axes[1, 0].set_title("Loudness vs Popularity")
         axes[1, 1].set_title("Valence vs Popularity")
 
-    plt.tight_layout()
-    plt.show()
+        plt.tight_layout()
+        plt.show()
