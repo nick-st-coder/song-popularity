@@ -11,7 +11,9 @@ def _():
     import seaborn as sns
     import matplotlib.pyplot as plt
 
-    return pd, plt, sns
+    from source.utils.plot import show_plot_4x4
+
+    return pd, plt, show_plot_4x4, sns
 
 
 @app.cell
@@ -215,77 +217,15 @@ def _(high_pop):
     loud  = high_pop['loudness']
     valence = high_pop['valence']
     pop = high_pop['track_popularity']
-    return dance, energy, loud, pop, valence
+
+    x_vars = [energy, dance, loud, valence]
+    title = ['Energy', 'Danceability', 'Loudness', 'Valence', 'Popularity']
+    return pop, title, x_vars
 
 
 @app.cell
-def _(dance, energy, loud, plt, pop, sns, valence):
-    fig, axes = plt.subplots(2, 2, figsize=(10, 8))
-
-    sns.scatterplot(x=energy, y=pop, ax=axes[0, 0])
-    sns.scatterplot(x=dance, y=pop, ax=axes[0, 1])
-    sns.scatterplot(x=loud, y=pop, ax=axes[1, 0])
-    sns.scatterplot(x=valence, y=pop, ax=axes[1, 1])
-
-    axes[0, 0].set_title("Energy vs Popularity")
-    axes[0, 1].set_title("Danceability vs Popularity")
-    axes[1, 0].set_title("Loudness vs Popularity")
-    axes[1, 1].set_title("Valence vs Popularity")
-
-    plt.tight_layout()
-    plt.show()
-    return
-
-
-@app.cell
-def _():
-    import sys
-    sys.path.insert(0, '..')
-    # from src.utils.plot import show_plot_4x4
-
-    # show_plot_4x4(True, True, pop, energy, dance, loud, valence)
-    return
-
-
-@app.cell
-def _(plt, sns):
-    def show_plot_4x4(scatter: bool, box: bool, y, x1, x2, x3, x4):
-        fig, axes = plt.subplots(2, 2, figsize=(10, 8))
-
-        if(scatter):
-            sns.scatterplot(x=x1, y=y, ax=axes[0, 0])
-            sns.scatterplot(x=x2, y=y, ax=axes[0, 1])
-            sns.scatterplot(x=x3, y=y, ax=axes[1, 0])
-            sns.scatterplot(x=x4, y=y, ax=axes[1, 1])
-
-            axes[0, 0].set_title("Energy vs Popularity")
-            axes[0, 1].set_title("Danceability vs Popularity")
-            axes[1, 0].set_title("Loudness vs Popularity")
-            axes[1, 1].set_title("Valence vs Popularity")
-        
-            plt.tight_layout()
-            plt.show()
-
-        if(box):
-            sns.boxplot(x=x1, y=y, ax=axes[0, 0])
-            sns.boxplot(x=x2, y=y, ax=axes[0, 1])
-            sns.boxplot(x=x3, y=y, ax=axes[1, 0])
-            sns.boxplot(x=x4, y=y, ax=axes[1, 1])
-
-            axes[0, 0].set_title("Energy vs Popularity")
-            axes[0, 1].set_title("Danceability vs Popularity")
-            axes[1, 0].set_title("Loudness vs Popularity")
-            axes[1, 1].set_title("Valence vs Popularity")
-
-            plt.tight_layout()
-            plt.show()
-
-    return (show_plot_4x4,)
-
-
-@app.cell
-def _(dance, energy, loud, pop, show_plot_4x4, valence):
-    show_plot_4x4(True, True, pop, energy, dance, loud, valence)
+def _(pop, show_plot_4x4, title, x_vars):
+    show_plot_4x4(True, True, x_vars, pop, title)
     return
 
 
