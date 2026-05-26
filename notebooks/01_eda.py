@@ -10,7 +10,10 @@ def _():
     import pandas as pd
     import seaborn as sns
     import matplotlib.pyplot as plt
+    import sys
+    import os
 
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
     from source.utils.plot import show_plot_4x4
 
     return pd, plt, show_plot_4x4, sns
@@ -212,20 +215,26 @@ def _(high_pop):
 
 @app.cell
 def _(high_pop):
-    energy = high_pop['energy']
-    dance = high_pop['danceability']
-    loud  = high_pop['loudness']
-    valence = high_pop['valence']
-    pop = high_pop['track_popularity']
+    y = high_pop['track_popularity']
 
-    x_vars = [energy, dance, loud, valence]
+    x_vars = [high_pop['energy'], high_pop['danceability'], 
+                            high_pop['loudness'], high_pop['valence']]
+
     title = ['Energy', 'Danceability', 'Loudness', 'Valence', 'Popularity']
-    return pop, title, x_vars
+    return title, x_vars, y
 
 
 @app.cell
-def _(pop, show_plot_4x4, title, x_vars):
-    show_plot_4x4(True, True, x_vars, pop, title)
+def _(show_plot_4x4, title, x_vars, y):
+    show_plot_4x4(True, True, x_vars, y, title)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
     return
 
 
