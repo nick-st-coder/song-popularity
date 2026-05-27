@@ -352,14 +352,97 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### SUMMARY
-    - `genre: pop` is the most popluar one, `subgenre: global`
+    ---
+    """)
+    return
 
-    - only `loudness` has positive correlation with popularity, sweetspot: -10db to -2db
 
-    - features like: energy, danceability, valence, acousticness, liveness has `no impact on popularity`
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Low popularity music
+    """)
+    return
 
-    - `duration of song` and `instrumentalness` has negative correlation with popularity. The sweetspot is around `1,5-3 minutes` long song and almost no instrumental parts.
+
+@app.cell
+def _(pd):
+    low_pop = pd.read_csv('../data/raw/low_popularity_spotify_data.csv')
+    return (low_pop,)
+
+
+@app.cell
+def _(low_pop):
+    low_pop
+    return
+
+
+@app.cell
+def _(low_pop):
+    low_pop.describe()
+    return
+
+
+@app.cell
+def _(low_pop):
+    low_pop.isna().sum()
+    return
+
+
+@app.cell
+def _(low_pop):
+    low_pop.shape
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _(low_pop):
+    low_pop.columns.to_list()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _(low_pop):
+    low_pop.groupby(by='playlist_genre').size().sort_values().head(10) #ty:ignore[no-matching-overload]
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _(low_pop):
+    low_pop['track_popularity'].hist(bins=30)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Just as expected non of tracks gained over 68 points of popularity (moved to pop_high dataset)
+
+    Vast majority of values are between 45 and 60, overall data is spreaded more left-skewed, even comparing to full dataset
     """)
     return
 
@@ -368,6 +451,201 @@ def _(mo):
 def _(mo):
     mo.md(r"""
     ---
+    """)
+    return
+
+
+@app.cell
+def _():
+    num_feat = ['energy', 'tempo', 'danceability', 'loudness', 'liveness',
+    'valence', 'speechiness', 'track_popularity', 'instrumentalness']
+    return (num_feat,)
+
+
+@app.cell
+def _(low_pop, num_feat, plt, sns):
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(low_pop[num_feat].corr(), annot=True, cmap='coolwarm')
+    plt.show()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    `Energy` has high positive correlation with `loudness, valence and danceability`
+
+    `Danceability` related to the `valence and loudness`
+
+    `Loudness` highly correlated with `valence`
+
+    Every feature has negative correlation with `instrumenalness` but the leaders of all of them are `energy, loudness and valence` -> energy related features
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _(low_pop):
+    y_low = low_pop['track_popularity']
+
+    x_list = [low_pop['energy'], low_pop['danceability'], 
+                            low_pop['loudness'], low_pop['valence']]
+
+    titles = ['Energy', 'Danceability', 'Loudness', 'Valence', 'Popularity']
+    return titles, x_list, y_low
+
+
+@app.cell
+def _(show_plot_4x4, titles, x_list, y_low):
+    show_plot_4x4(True, True, x_list, y_low, titles)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Now in this plots data is spreaded even more evenly. There's `no relationship` between those values
+
+    The only big difference comparing to high popular dataset is that in this one loudness has even more outliers (because of much more cases of unpopular quite music)
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _(low_pop):
+    var = [low_pop["acousticness"], low_pop["instrumentalness"], 
+                            low_pop["duration_ms"], low_pop["liveness"]]
+                        
+    names = ['Acoustic', 'Instrumental', 'Duration', 'Live', 'Popularity']
+    return names, var
+
+
+@app.cell
+def _(names, show_plot_4x4, var, y_low):
+    show_plot_4x4(True, True, var, y_low, names)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    The first thing that you've may noticed is outliers on `duration_ms and liveness` which is eg `13552 seconds long` (3.8 hours). This are full concert audios and it could distort our predictions with their perfect 1.0 `liveness` and high duration. And just like in high_pop dataset, the longer the music the lower the popularity
+
+
+    What's interesting is that here `instrumentalness` mostly divided into 2 clusters  0.1 values (almost no instrumental part) and 0.9 (almost full song is instrumental) and both of clusters are spreaded all across y value, but still `no relationship`
+
+    So let's analyse our outliers.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _():
+    useful_features = ["track_popularity", "speechiness", "danceability", "track_artist",
+    "duration_ms", "energy", "playlist_genre", "playlist_subgenre", "track_name","instrumentalness",
+    "valence", "loudness","liveness", "acousticness", "playlist_name"]
+    return (useful_features,)
+
+
+@app.cell
+def _(low_pop):
+    low_pop['duration_ms'].hist(bins=30, log=True)
+    return
+
+
+@app.cell
+def _(low_pop, useful_features):
+    low_pop[useful_features][(low_pop['duration_ms'] >= 600000)] #over 10 minutes long
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    As expected most of those songs are live sesions which can distort out model.
+
+    Those outliers are useless because are ultimate goal is to find best music algorithm not how popular concerts are -> will drop them
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _(low_pop):
+    low_pop['liveness'].hist(bins=30, log=True)
+    return
+
+
+@app.cell
+def _(low_pop, useful_features):
+    low_pop[useful_features][(low_pop['liveness'] > 0.8)] 
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Those outliers are just normal music with good live perfomance rate, nothing special, which is pretty strange for me since by logic the more liveness song is the more chance it's gonna be live recordings.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### SUMMARY
+    - `genre: pop` is the most popluar one, `subgenre: global`
+
+    - only `loudness` has positive correlation with popularity, sweetspot: -10db to -2db
+
+    - features like: energy, danceability, valence, acousticness, liveness has `no impact on popularity`
+
+    - `duration of song` and `instrumentalness` has negative correlation with popularity. The sweetspot is around `1,5-3 minutes` long song and almost no instrumental parts.
+
+    ---
+
+    - dataset contained some live recordings which were bad outliers
+
+    - i can write the same conclusions as for the popular music for the rest of the features most of the time there are no relationship at all
     """)
     return
 
