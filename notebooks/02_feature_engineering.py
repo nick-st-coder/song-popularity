@@ -9,8 +9,6 @@ def _():
     import pandas as pd
     import numpy as np
 
-    from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
     high_pop = pd.read_csv('../data/raw/spotify/high_popularity_spotify_data.csv')
     low_pop = pd.read_csv('../data/raw/spotify/low_popularity_spotify_data.csv')
     return high_pop, low_pop, pd
