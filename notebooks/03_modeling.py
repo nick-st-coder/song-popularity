@@ -23,9 +23,13 @@ def _():
 
     return (
         ColumnTransformer,
+        LGBMRegressor,
         OneHotEncoder,
         Pipeline,
+        RandomForestRegressor,
         SimpleImputer,
+        cross_val_score,
+        mlflow,
         pd,
         train_test_split,
     )
@@ -84,7 +88,7 @@ def _(ColumnTransformer, cat_col, cat_pipe, num_col, num_pipe):
         ("numeric", num_pipe, num_col),
         ("categorical", cat_pipe, cat_col)
     ])
-    return
+    return (preprocess,)
 
 
 @app.cell(hide_code=True)
@@ -113,7 +117,7 @@ def _(X, train_test_split, y):
         # dataset is 1.6k of popular rows and 3.2k of unpopular ones going after each other -> shuffle must be maden
         stratify=y
     )
-    return
+    return X_train, y_train
 
 
 @app.cell(hide_code=True)
@@ -133,7 +137,87 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(mlflow):
+    mlflow.set_tracking_uri("http://127.0.0.1:5000/")
+    mlflow.set_experiment("rf_vs_lightgbm")
+    return
+
+
+@app.cell
+def _(
+    Pipeline,
+    RandomForestRegressor,
+    X_train,
+    cross_val_score,
+    mlflow,
+    preprocess,
+    y_train,
+):
+    with mlflow.start_run(run_name="baseline_rf"):
+        baseline_rf = Pipeline([
+            ("preprocess", preprocess),
+            ("model", RandomForestRegressor(random_state=4, n_jobs=-1))
+        ])  
+
+        score = -cross_val_score(
+            baseline_rf,
+            X_train,
+            y_train,
+            cv=5,
+            scoring='neg_root_mean_squared_error'
+        ).mean()
+
+        mlflow.log_metric("cv_rmse",score)
+        mlflow.log_param("model", "RandomForestRegressor")
+        mlflow.log_param("random_state", 4)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _(
+    LGBMRegressor,
+    Pipeline,
+    X_train,
+    cross_val_score,
+    mlflow,
+    preprocess,
+    y_train,
+):
+    import lightgbm
+    with mlflow.start_run(run_name="baseline_lightgbm"):
+
+        baseline_lightgbm = Pipeline([
+            ("preprocess", preprocess),
+            ("model", LGBMRegressor(random_state=4, n_jobs=-1, verbose=-1))
+        ])  
+
+        score_lgbm = -cross_val_score(
+            baseline_lightgbm,
+            X_train,
+            y_train,
+            cv=5,
+            scoring='neg_root_mean_squared_error'
+        ).mean()
+
+        mlflow.log_metric("cv_rmse",score_lgbm)
+        mlflow.log_param("model", "LightGBM")
+        mlflow.log_param("random_state", 4)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
     return
 
 
