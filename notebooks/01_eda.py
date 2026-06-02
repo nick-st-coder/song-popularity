@@ -14,7 +14,7 @@ def _():
     import os
 
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-    from source.utils.plot import show_plot_4x4
+    from source.eda.plot import show_plot_4x4
 
     return pd, plt, show_plot_4x4, sns
 
