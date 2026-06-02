@@ -65,7 +65,7 @@ def _(mo):
 
 @app.cell
 def _(high_pop):
-    high_pop.groupby(by='playlist_genre').size().sort_values(ascending=False).head(5) #ty:ignore[no-matching-overload]
+    high_pop.groupby(by='playlist_genre').size().sort_values(ascending=False).head(5) 
     return
 
 
@@ -419,7 +419,7 @@ def _(mo):
 
 @app.cell
 def _(low_pop):
-    low_pop.groupby(by='playlist_genre').size().sort_values().head(10) #ty:ignore[no-matching-overload]
+    low_pop.groupby(by='playlist_genre').size().sort_values().head(10)
     return
 
 
