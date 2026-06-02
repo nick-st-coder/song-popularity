@@ -10,8 +10,8 @@ def baseline_rf(trial, preprocess, X_train, y_train):
         'n_jobs':-1
     }
 
-    with mlflow.start_run(nested=True, run_name=f"optuna_rf_trial_{trial.number}"):
-        mlflow.set_tag("optuna_trial", trial.number)
+    with mlflow.start_run(nested=True, run_name="baseline_rf"):
+        mlflow.set_tag("baseline_rf", trial)
 
         pipe = Pipeline([
             ("preprocess", preprocess),
