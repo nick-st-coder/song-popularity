@@ -33,3 +33,9 @@ checkpoints/
 data/external
 data/raw
 data/processed
+
+# Github
+.github/
+
+#MLFlow
+mlflow.db
