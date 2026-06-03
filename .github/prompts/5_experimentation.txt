@@ -1,0 +1,17 @@
+Task: You're a senior data scientist how has to improve my workflow
+You can change my project whatever you like
+Dataset is credit risk which is small so your main goal is good value of rmse (other metric) 
+
+Current setup:
+you'll see in mlflow.ipynb
+
+Tools:
+MLflow, Optuna, etc by your choice 
+
+Questions:
+1. How should I structure this project?
+
+Output format:
+- Recommended workflow
+- Tracking strategy
+- Common mistakes

@@ -1,0 +1,93 @@
+Task: Optimize SARIMAX + Optuna with custom rolling CV
+
+Current setup:
+- Model: SARIMAX with exogenous features
+- Dataset: hourly energy (~140k rows)
+- Target: PJME_MW
+- Features: hour, dow, is_weekend, sin/cos encodings
+
+Training:
+- Hyperparameter tuning with Optuna
+- Each trial runs a custom rolling cross-validation
+
+Validation logic:
+- Rolling CV with:
+  - horizon = 1 week (24*7)
+  - step = 1 week
+  - max_splits = 3
+- Training window limited to last 6 months
+- SARIMAX is refit for each split
+
+Code:
+def rmspe(y_true, y_pred):
+    mask = y_true != 0
+    return np.sqrt(np.mean(((y_true[mask] - y_pred[mask]) / y_true[mask]) ** 2))
+
+def rolling_cv_sarimax(y, X, order, seasonal_order, horizon=24*7, step=24*7, max_splits=3):
+    scores = []
+    split_count = 0
+
+    for start in range(0, len(y) - horizon, step):
+        
+        if split_count >= max_splits:
+            break
+        
+        train_end = start + horizon
+
+        WINDOW = 24 * 30 * 6
+        y_train = y.iloc[max(0, train_end - WINDOW):train_end]
+        y_test = y.iloc[train_end:train_end + horizon]
+
+        X_train = X.iloc[max(0, train_end - WINDOW):train_end]
+        X_test = X.iloc[train_end:train_end + horizon]
+
+        try:
+            model = SARIMAX(
+                y_train,
+                exog=X_train,
+                order=order,
+                seasonal_order=seasonal_order,
+                enforce_stationarity=False,
+                enforce_invertibility=False,
+            )
+
+            fit = model.fit(disp=False)
+
+            if not fit.mle_retvals["converged"]:
+                return np.inf
+
+            preds = fit.forecast(steps=len(y_test), exog=X_test)
+
+            y_test_real = np.expm1(y_test.values)
+            preds_real = np.expm1(preds.values)
+
+            score = rmspe(y_test_real, preds_real)
+            scores.append(score)
+
+        except:
+            continue
+
+    return np.mean(scores)
+
+Problem:
+- Training takes hours (very slow due to repeated SARIMAX fitting)
+
+Goal:
+- Reduce runtime significantly
+- Keep accuracy within ~5%
+
+Constraints:
+- No deep learning
+- Must remain interpretable
+
+Questions:
+1. Where are the biggest computational bottlenecks in this setup?
+2. Which parts of this CV design are unnecessarily expensive?
+3. Suggest 3–5 concrete optimizations (code-level if possible)
+4. What should I simplify or remove?
+5. Are there better validation strategies for this case?
+
+Be critical:
+- Identify inefficiencies
+- Point out statistical or modeling mistakes
+- Suggest trade-offs between correctness and speed

@@ -1,0 +1,30 @@
+Task: Design or improve a model
+
+Problem type:
+[time series / regression / classification]
+
+Data:
+- Rows: 
+- Features:
+- Target:
+- Known patterns (seasonality, trends, etc.):
+
+Current approach:
+[what you are doing now]
+
+Goal:
+[accuracy / speed / interpretability]
+
+Constraints:
+- 
+
+Questions:
+1. What modeling approaches should I consider?
+2. Which one is most suitable and why?
+3. What validation strategy should I use?
+4. What are the main risks?
+
+Output format:
+- Options (with pros/cons)
+- Recommended approach
+- Implementation outline

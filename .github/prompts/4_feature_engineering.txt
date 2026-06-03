@@ -1,0 +1,28 @@
+Task: Feature engineering
+
+Data:
+[describe dataset]
+
+Target:
+[what you're predicting]
+
+Current features:
+[list or describe]
+
+Problem:
+[underfitting / overfitting / weak signal]
+
+Questions:
+1. What new features should I create?
+2. Which ones are most important?
+3. Which are risky (leakage, overfitting)?
+
+Constraints:
+- must be fast
+- explainable
+
+Output format:
+- Feature ideas
+- Why they help
+- Implementation hints
+- Risks
