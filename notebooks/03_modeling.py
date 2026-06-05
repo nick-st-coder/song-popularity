@@ -18,7 +18,7 @@ def _():
     from lightgbm import LGBMRegressor
 
     import optuna
-
+    import lightgbm
     import mlflow
 
     return (
@@ -191,7 +191,6 @@ def _(
     preprocess,
     y_train,
 ):
-    import lightgbm
     with mlflow.start_run(run_name="baseline_lightgbm"):
 
         baseline_lightgbm = Pipeline([
@@ -218,6 +217,19 @@ def _(mo):
     mo.md(r"""
     ---
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Final Model  - `LightGBM`
+    """)
+    return
+
+
+@app.cell
+def _():
     return
 
 
