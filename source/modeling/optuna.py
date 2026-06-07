@@ -27,7 +27,7 @@ float
 """
 def objective_rf(trial:Trial, 
                 preprocess:ColumnTransformer, 
-                X_train: pd.Dataframe, 
+                X_train: pd.DataFrame, 
                 y_train: pd.DataFrame):
     
     params = get_rf_params(trial)
@@ -82,7 +82,7 @@ float
 """
 def objective_lgbm(trial:Trial, 
                    preprocess:ColumnTransformer, 
-                   X_train: pd.Dataframe, 
+                   X_train: pd.DataFrame, 
                    y_train: pd.DataFrame):
 
     params = get_lgbm_params(trial)
