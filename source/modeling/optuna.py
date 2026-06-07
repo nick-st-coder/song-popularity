@@ -1,16 +1,19 @@
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, KFold
 from lightgbm import LGBMRegressor
 import mlflow
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from optuna import Trial
 
+# Random Forest
+
 def objective_rf(trial:Trial, 
                 preprocess:ColumnTransformer, 
                 X_train: pd.Dataframe, 
                 y_train: pd.DataFrame):
+    
     params = {
         'n_estimators':trial.suggest_int('n_estimators', 200, 800),
         'max_depth':trial.suggest_int('max_depth', 4, 8),
@@ -25,28 +28,41 @@ def objective_rf(trial:Trial,
         'n_jobs':-1
     }
 
+    cv = KFold(
+        n_splits=5,
+        shuffle=True,
+        random_state=42,
+    )
+
     with mlflow.start_run(nested=True, run_name=f"optuna_rf_trial_{trial.number}"):
         mlflow.set_tag("optuna_trial", trial.number)
 
         pipe = Pipeline([
             ("preprocess", preprocess),
-            ("model", RandomForestRegressor(**params))
+            ("model", RandomForestRegressor(**params, n_jobs=-1))
         ])
 
-        score =  cross_val_score(
-            pipe,
-            X_train, 
+        scores = -cross_val_score(
+            pipe, 
+            X_train,
             y_train,
-            cv=5,
-            scoring='neg_root_mean_squared_error'
-        ).mean()
+            cv=cv,
+            scoring='neg_root_mean_squared_error',
+            n_jobs=-1
+        )
+
+        mean_rmse = scores.mean()
+        std_rmse = scores.std()
 
         mlflow.log_params(params)
-        mlflow.log_metric("cv_score", score)
+        mlflow.log_metric("mean_rmse", mean_rmse)
+        mlflow.log_metric("std_rmse", std_rmse)
         mlflow.sklearn.log_model(pipe, f"model_trial_{trial.number}")
 
-        return score
+    return mean_rmse, std_rmse
     
+# LightGBM
+
 def objective_lgbm(trial:Trial, 
                    preprocess:ColumnTransformer, 
                    X_train: pd.Dataframe, 
@@ -67,9 +83,15 @@ def objective_lgbm(trial:Trial,
         'verbosity':-1
     }   
 
+    cv = KFold(
+        n_splits=5,
+        shuffle=True,
+        random_state=42,
+    )
+
     model = Pipeline([
         ("preprocess", preprocess),
-        ("model", LGBMRegressor(**params))
+        ("model", LGBMRegressor(**params, n_jobs=-1))
     ])
 
     with mlflow.start_run(run_name=f'trial_number{trial.number}'):
@@ -79,12 +101,17 @@ def objective_lgbm(trial:Trial,
             model, 
             X_train,
             y_train,
-            cv=5,
-            scoring='neg_root_mean_squared_error'
-        ).mean()
+            cv=cv,
+            scoring='neg_root_mean_squared_error',
+            n_jobs=-1
+        )
+
+        mean_rmse = scores.mean()
+        std_rmse = scores.std()
 
     mlflow.log_params(params)
-    mlflow.log_metric("neg_rmse", scores)
+    mlflow.log_metric("mean_rmse", mean_rmse)
+    mlflow.log_metric("std_rmse", std_rmse)
     mlflow.sklearn.log_model(sk_model=model, artifact_path=f"trial_{trial.number}")
 
-    return scores
+    return mean_rmse, std_rmse
