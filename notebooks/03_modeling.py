@@ -6,6 +6,8 @@ app = marimo.App()
 
 @app.cell
 def _():
+    import os
+    import sys
     import pandas as pd
 
     from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -13,12 +15,10 @@ def _():
     from sklearn.compose import ColumnTransformer
     from sklearn.impute import SimpleImputer
     from sklearn.model_selection import train_test_split, cross_val_score
-
     from sklearn.ensemble import RandomForestRegressor
     from lightgbm import LGBMRegressor
 
     import optuna
-    import lightgbm
     import mlflow
 
     return (
@@ -30,9 +30,19 @@ def _():
         SimpleImputer,
         cross_val_score,
         mlflow,
+        os,
         pd,
+        sys,
         train_test_split,
     )
+
+
+@app.cell
+def _(os, sys):
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+    from source.modeling.optuna import objective_lgbm
+
+    return
 
 
 @app.cell
