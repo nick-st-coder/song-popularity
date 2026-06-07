@@ -3,8 +3,14 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
 from lightgbm import LGBMRegressor
 import mlflow
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from optuna import Trial
 
-def objective_rf(trial, preprocess, X_train, y_train):
+def objective_rf(trial:Trial, 
+                preprocess:ColumnTransformer, 
+                X_train: pd.Dataframe, 
+                y_train: pd.DataFrame):
     params = {
         'n_estimators':trial.suggest_int('n_estimators', 200, 800),
         'max_depth':trial.suggest_int('max_depth', 4, 8),
@@ -41,7 +47,10 @@ def objective_rf(trial, preprocess, X_train, y_train):
 
         return score
     
-def objective_lgbm(trial, preprocess, X_train, y_train):
+def objective_lgbm(trial:Trial, 
+                   preprocess:ColumnTransformer, 
+                   X_train: pd.Dataframe, 
+                   y_train: pd.DataFrame):
     params = {
         'colsample_bytree':trial.suggest_float('colsample_bytree', 0.5, 1.0),
         'subsample':trial.suggest_float('subsample', 0.5, 1.0),
