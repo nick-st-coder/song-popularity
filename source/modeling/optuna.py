@@ -11,7 +11,20 @@ from optuna import Trial
 from .params import get_lgbm_params, get_rf_params
 
 # Random Forest
+"""
+Optuna objective function for Random Forest regression.
 
+Performs:
+- getting params
+- preprocessing
+- 5-fold cross validation
+- RMSE evaluation
+
+Returns
+-------
+float
+    Mean and std RMSE across folds.
+"""
 def objective_rf(trial:Trial, 
                 preprocess:ColumnTransformer, 
                 X_train: pd.Dataframe, 
@@ -53,7 +66,20 @@ def objective_rf(trial:Trial,
     return mean_rmse, std_rmse
     
 # LightGBM
+"""
+Optuna objective function for LightGBM regression.
 
+Performs:
+- getting params
+- preprocessing
+- 5-fold cross validation
+- RMSE evaluation
+
+Returns
+-------
+float
+    Mean and std RMSE across folds.
+"""
 def objective_lgbm(trial:Trial, 
                    preprocess:ColumnTransformer, 
                    X_train: pd.Dataframe, 
