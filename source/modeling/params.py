@@ -5,7 +5,7 @@ def get_lgbm_params(trial):
         'learning_rate':trial.suggest_float('learning_rate', 0.005, 0.3, log=True),
         'max_depth':trial.suggest_int('max_depth', 5, 12),
         'n_estimators':trial.suggest_int('n_estimators', 100, 1200),
-        'num_leaves':trial.suggest_int('num_leaves', 6, 255),
+        'num_leaves':trial.suggest_int('num_leaves', 15, 255, log=True),
         'reg_alpha':trial.suggest_float('reg_alpha', 1e-8, 10.0, log=True),
         'reg_lambda':trial.suggest_float('reg_lambda', 1e-8, 10.0, log=True),
         'min_child_samples':trial.suggest_int('min_child_samples', 5, 100),
