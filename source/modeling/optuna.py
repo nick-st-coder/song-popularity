@@ -63,7 +63,7 @@ def objective_rf(trial:Trial,
         mlflow.log_metric("std_rmse", std_rmse)
         mlflow.sklearn.log_model(pipe, f"model_trial_{trial.number}")
 
-    return mean_rmse, std_rmse
+    return mean_rmse
     
 # LightGBM
 """
@@ -118,4 +118,4 @@ def objective_lgbm(trial:Trial,
         mlflow.log_metric("std_rmse", std_rmse)
         mlflow.sklearn.log_model(sk_model=model, name=f"trial_{trial.number}")
         
-    return mean_rmse, std_rmse
+    return mean_rmse
