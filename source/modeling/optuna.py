@@ -98,24 +98,16 @@ def objective_lgbm(trial:Trial,
         ("model", LGBMRegressor(**params, n_jobs=-1))
     ])
 
-    with mlflow.start_run(run_name=f'trial_number{trial.number}', nested=True):
-        mlflow.set_tag("optuna_params_tuning", trial.number)
+    scores = -cross_val_score(
+        model, 
+        X_train,
+        y_train,
+        cv=cv,
+        scoring='neg_root_mean_squared_error',
+        n_jobs=-1
+    )
 
-        scores = -cross_val_score(
-            model, 
-            X_train,
-            y_train,
-            cv=cv,
-            scoring='neg_root_mean_squared_error',
-            n_jobs=-1
-        )
-
-        mean_rmse = scores.mean()
-        std_rmse = scores.std()
-
-        mlflow.log_params(params)
-        mlflow.log_metric("mean_rmse", mean_rmse)
-        mlflow.log_metric("std_rmse", std_rmse)
-        mlflow.sklearn.log_model(sk_model=model, name=f"trial_{trial.number}")
+    mean_rmse = scores.mean()
+    std_rmse = scores.std()
         
     return mean_rmse
