@@ -30,6 +30,7 @@ def _():
         SimpleImputer,
         cross_val_score,
         mlflow,
+        optuna,
         os,
         pd,
         sys,
@@ -42,6 +43,14 @@ def _(os, sys):
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
     from source.modeling.optuna import objective_lgbm
 
+    return (objective_lgbm,)
+
+
+@app.cell
+def _():
+    from sklearn import set_config
+    set_config(transform_output="pandas")
+    # removes warnings from optuna params tuning
     return
 
 
@@ -87,7 +96,7 @@ def _(OneHotEncoder, Pipeline, SimpleImputer):
     ])
 
     cat_pipe = Pipeline([
-        ("onehot", OneHotEncoder(handle_unknown='ignore'))
+        ("onehot", OneHotEncoder(handle_unknown='ignore', sparse_output=False))
     ])
     return cat_pipe, num_pipe
 
@@ -149,7 +158,7 @@ def _(mo):
 @app.cell
 def _(mlflow):
     mlflow.set_tracking_uri("http://127.0.0.1:5000/")
-    mlflow.set_experiment("rf_vs_lightgbm")
+    mlflow.set_experiment("song-lightgbm")
     return
 
 
@@ -233,14 +242,75 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### Final Model  - `LightGBM`
+    #### Model params tuning - `LightGBM`
     """)
     return
 
 
 @app.cell
-def _():
+def _(optuna):
+    study = optuna.create_study(direction="minimize", pruner=optuna.pruners.MedianPruner())
+    return (study,)
+
+
+@app.cell
+def _(X_train, objective_lgbm, preprocess, study, y_train):
+    study.optimize(
+        lambda trial: objective_lgbm(
+            trial,
+            preprocess,
+            X_train,
+            y_train
+        ),
+        n_trials=50, 
+        show_progress_bar=True
+    )
     return
+
+
+@app.cell
+def _(study):
+    best_params = study.best_params
+    return (best_params,)
+
+
+@app.cell
+def _(study):
+    print(study.best_value)
+    print(study.best_params)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell
+def _(LGBMRegressor, Pipeline, best_params, preprocess):
+    best_model = Pipeline([
+        ("preprocess", preprocess),
+        ("model", LGBMRegressor(**best_params))
+    ])
+    return (best_model,)
+
+
+@app.cell
+def _(X_train, best_model, y_train):
+    best_model.fit(X_train, y_train)
+    return
+
+
+app._unparsable_cell(
+    r"""
+    with mlflow.start_run(run_name="best_model"):
+    
+    """,
+    name="_"
+)
 
 
 if __name__ == "__main__":
