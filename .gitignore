@@ -39,5 +39,6 @@ data/processed
 .github/instructions/
 .github/agents-documentation/
 
-#MLFlow
+#DB
 mlflow.db
+optuna_lgbm.db
