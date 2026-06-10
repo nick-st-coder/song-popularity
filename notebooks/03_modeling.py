@@ -322,13 +322,95 @@ def _(
         score_rmse = root_mean_squared_error(y_test, y_pred)
         print(f"RMSE: {score_rmse:.4f}")
 
-        mlflow.log_metric("rmse", score_rmse)
+        mlflow.log_metric("cv_rmse", score_rmse)
         mlflow.log_params(best_params)
 
         mlflow.sklearn.log_model(
             sk_model=best_model,
             artifact_path="best_lgbm"
         )
+
+        mlflow.register_model(
+            model_uri=f"runs:/{mlflow.active_run().info.run_id}/best_lgbm",
+            name="LightGBM-spotify"
+        )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Saving model
+    """)
+    return
+
+
+@app.cell
+def _():
+    import joblib as jl
+    # jl.dump(best_model, "../models/best_lgbm.pkl")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### `SUMMARY`
+
+    I compared tuned model with its baseline and rf baseline and this is conclusions that i can make based on that
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### `SPEED`
+    - LGBM bsl was `125% faster` than RF bsl
+    - Tuned model was `66% slower` than RF bsl and `275% slower` than LGBM baseline
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### `METRICS`
+    - LGBM bsl did `7%` worse than rf baseline (with value `12.33` against `11.47`)
+    - Tuned model did `8,7%` better than rf and `16%` than not tuned
+    """)
     return
 
 
