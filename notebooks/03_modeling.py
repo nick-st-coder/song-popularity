@@ -16,6 +16,7 @@ def _():
     from sklearn.impute import SimpleImputer
     from sklearn.model_selection import train_test_split, cross_val_score
     from sklearn.ensemble import RandomForestRegressor
+    from sklearn.metrics import root_mean_squared_error
     from lightgbm import LGBMRegressor
 
     import optuna
@@ -33,6 +34,7 @@ def _():
         optuna,
         os,
         pd,
+        root_mean_squared_error,
         sys,
         train_test_split,
     )
@@ -136,7 +138,7 @@ def _(X, train_test_split, y):
         # dataset is 1.6k of popular rows and 3.2k of unpopular ones going after each other -> shuffle must be maden
         stratify=y
     )
-    return X_train, y_train
+    return X_test, X_train, y_test, y_train
 
 
 @app.cell(hide_code=True)
@@ -158,7 +160,7 @@ def _(mo):
 @app.cell
 def _(mlflow):
     mlflow.set_tracking_uri("http://127.0.0.1:5000/")
-    mlflow.set_experiment("song-lightgbm")
+    mlflow.set_experiment("song-lgbm")
     return
 
 
@@ -249,7 +251,8 @@ def _(mo):
 
 @app.cell
 def _(optuna):
-    study = optuna.create_study(direction="minimize", pruner=optuna.pruners.MedianPruner())
+    study = optuna.create_study(direction="minimize", pruner=optuna.pruners.MedianPruner(), 
+    study_name="lgbm_tuning", storage="sqlite:///optuna_lgbm.db", load_if_exists=True)
     return (study,)
 
 
@@ -304,13 +307,37 @@ def _(X_train, best_model, y_train):
     return
 
 
-app._unparsable_cell(
-    r"""
+@app.cell
+def _(
+    X_test,
+    best_model,
+    best_params,
+    mlflow,
+    root_mean_squared_error,
+    y_test,
+):
     with mlflow.start_run(run_name="best_model"):
-    
-    """,
-    name="_"
-)
+        y_pred = best_model.predict(X_test)
+
+        score_rmse = root_mean_squared_error(y_test, y_pred)
+        print(f"RMSE: {score_rmse:.4f}")
+
+        mlflow.log_metric("rmse", score_rmse)
+        mlflow.log_params(best_params)
+
+        mlflow.sklearn.log_model(
+            sk_model=best_model,
+            artifact_path="best_lgbm"
+        )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
 
 
 if __name__ == "__main__":
