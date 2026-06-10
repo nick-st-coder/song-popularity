@@ -1,61 +1,52 @@
 Task: Debug an issue
 
 Code:
-with mlflow.start_run(run_name="params_optuna_dbscan"):
-    mlflow.set_tag("optimization_type", "optuna")
-    mlflow.set_tag("model_type", "dbscan")
+with mlflow.start_run(run_name="best_model"):
+    y_pred = best_model.predict(X_test)
 
-    study = optuna.create_study(direction='maximize')
-    study.optimize(objective, n_trials=15, show_progress_bar=True)
+    score_rmse = root_mean_squared_error(y_test, y_pred)
+    print(f"RMSE: {score_rmse:.4f}")
 
-    best_trial = study.best_trial
+    mlflow.log_metric("rmse", score_rmse)
+    mlflow.log_params(best_params)
 
-    mlflow.log_param("best_trial_number", best_trial.number)
-    mlflow.log_metric("best_trial_metric", best_trial.value)
-    mlflow.log_params({"best_"+k: v for k, v in best_trial.params.items()})
+    mlflow.sklearn.log_model(
+        sk_model=best_model,
+        artifact_path="best_lgbm"
+    )
 
 Error:
----------------------------------------------------------------------------
-ValueError                                Traceback (most recent call last)
-Cell In[30], line 6
-      2     mlflow.set_tag("optimization_type", "optuna")
-      3     mlflow.set_tag("model_type", "dbscan")
-      4 
-      5     study = optuna.create_study(direction='maximize')
-----> 6     study.optimize(objective, n_trials=15, show_progress_bar=True)
-      7 
-      8     best_trial = study.best_trial
-      9 
-
-File d:\reps\ds\.venv\Lib\site-packages\optuna\study\study.py:490, in Study.optimize(self, func, n_trials, timeout, n_jobs, catch, callbacks, gc_after_trial, show_progress_bar)
-    388 def optimize(
-    389     self,
-    390     func: ObjectiveFuncType,
-   (...)    397     show_progress_bar: bool = False,
-    398 ) -> None:
-    399     """Optimize an objective function.
-    400 
-    401     Optimization is done by choosing a suitable set of hyperparameter values from a given
-   (...)    488             If nested invocation of this method occurs.
-    489     """
---> 490     _optimize(
-    491         study=self,
-...
-                                  ['avg_price', 'max_price', 'avg_discount',
-                                   'total_quantity', 'total_spent', 'avg_rating',
-                                   'avg_reviews', 'avg_item_value'])])
- PCA(n_components=2)].
-Reshape your data either using array.reshape(-1, 1) if your data has a single feature or array.reshape(1, -1) if it contains a single sample.
-Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...
+Traceback (most recent call last):
+  Cell cell-29, line 3
+    score_rmse = root_mean_squared_error(y_pred, y_test)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File d:\reps\song-popularity\.venv\Lib\site-packages\sklearn\utils\_param_validation.py:218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File d:\reps\song-popularity\.venv\Lib\site-packages\sklearn\metrics\_regression.py:666, in root_mean_squared_error
+    mean_squared_error(
+  File d:\reps\song-popularity\.venv\Lib\site-packages\sklearn\utils\_param_validation.py:191, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File d:\reps\song-popularity\.venv\Lib\site-packages\sklearn\metrics\_regression.py:579, in mean_squared_error
+    _check_reg_targets_with_floating_dtype(
+  File d:\reps\song-popularity\.venv\Lib\site-packages\sklearn\metrics\_regression.py:208, in _check_reg_targets_with_floating_dtype
+    y_type, y_true, y_pred, sample_weight, multioutput = _check_reg_targets(
+                                                         ^^^^^^^^^^^^^^^^^^^
+  File d:\reps\song-popularity\.venv\Lib\site-packages\sklearn\metrics\_regression.py:113, in _check_reg_targets
+    check_consistent_length(y_true, y_pred, sample_weight)
+  File d:\reps\song-popularity\.venv\Lib\site-packages\sklearn\utils\validation.py:464, in check_consistent_length
+    raise ValueError(
+ValueError: Found input variables with inconsistent numbers of samples: [3712, 928]
 
 Expected behavior:
-optuna working properly
+mlflow working properly -> best model saves in mlflow
 
 Actual behavior:
-optuna crushing 
+mlflow crushing, no best model 
 
 Context:
-- used optuna to find best params for dbscan
+- trying to save best model to mlflow 
 
 Questions:
 1. What is causing the issue?
