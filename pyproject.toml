@@ -25,4 +25,6 @@ dependencies = [
     "torch>=2.12.0",
     "uvicorn>=0.47.0",
     "xgboost>=3.2.0",
+    "shap>=0.47.0",
+    "numba>=0.59.0",
 ]
