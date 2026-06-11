@@ -352,14 +352,6 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ---
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
     #### Low popularity music
     """)
     return
@@ -392,20 +384,6 @@ def _(low_pop):
 @app.cell
 def _(low_pop):
     low_pop.shape
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ---
-    """)
-    return
-
-
-@app.cell
-def _(low_pop):
-    low_pop.columns.to_list()
     return
 
 
