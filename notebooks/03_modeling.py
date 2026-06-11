@@ -334,7 +334,7 @@ def _(
             model_uri=f"runs:/{mlflow.active_run().info.run_id}/best_lgbm",
             name="LightGBM-spotify"
         )
-    return
+    return (y_pred,)
 
 
 @app.cell(hide_code=True)
@@ -357,6 +357,72 @@ def _(mo):
 def _():
     import joblib as jl
     # jl.dump(best_model, "../models/best_lgbm.pkl")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Error analysis
+    """)
+    return
+
+
+@app.cell
+def _(df, y_pred, y_test):
+    errors = y_test - y_pred
+    worst_songs = errors.sort_values().head(300).index
+    df_worst  = df.loc[worst_songs]
+    return (df_worst,)
+
+
+@app.cell
+def _(df, df_worst):
+    print(df_worst.groupby("playlist_genre")['playlist_genre'].count().sort_values(ascending=False).head())
+    print(df.groupby("playlist_genre")['playlist_genre'].count().sort_values(ascending=False).head(5))
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Are some genres are most likely to be unpopular? Let's find out
+
+    Since there're genres that repeats more frequently we must do percentage estimation
+    """)
+    return
+
+
+@app.cell
+def _():
+    print("Electronic: ", (38 / 568) * 100)
+    print("Pop: ", (30 / 512) * 100)
+    print("Ambient: ", (27 / 356) * 100)
+    print("Latin: ", (27 / 419) * 100)
+    return
+
+
+@app.cell
+def _(df_worst):
+    df_worst.groupby(by='playlist_genre').agg({
+            'track_popularity':'mean',
+            'energy':'mean',
+            'danceability':'mean',
+            'playlist_genre':'count',
+            'loudness':'mean',
+            'liveness':'mean',
+            'valence':'mean',
+            'tempo':'mean',
+            'duration_ms':'mean'
+        })
     return
 
 
