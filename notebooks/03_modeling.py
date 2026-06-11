@@ -185,7 +185,7 @@ def _(
             X_train,
             y_train,
             cv=5,
-            scoring='neg_root_mean_squared_error'
+            scoring='neg_root_max_squared_error'
         ).mean()
 
         mlflow.log_metric("cv_rmse",score)
@@ -384,13 +384,6 @@ def _(df, y_pred, y_test):
     return (df_worst,)
 
 
-@app.cell
-def _(df, df_worst):
-    print(df_worst.groupby("playlist_genre")['playlist_genre'].count().sort_values(ascending=False).head())
-    print(df.groupby("playlist_genre")['playlist_genre'].count().sort_values(ascending=False).head(5))
-    return
-
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -402,27 +395,95 @@ def _(mo):
 
 
 @app.cell
-def _():
-    print("Electronic: ", (38 / 568) * 100)
-    print("Pop: ", (30 / 512) * 100)
-    print("Ambient: ", (27 / 356) * 100)
-    print("Latin: ", (27 / 419) * 100)
+def _(df, df_worst):
+    print(df_worst.groupby("playlist_genre")['playlist_genre'].count().sort_values(ascending=False).head(10))
+    print(df.groupby("playlist_genre")['playlist_genre'].count().sort_values(ascending=False).head(10))
+    return
+
+
+@app.cell
+def _(pd):
+    df_per = pd.DataFrame({
+        "genre": [
+            "electronic", "pop", "ambient", "latin", "rock",
+            "hip-hop", "world", "arabic", "lofi","brazilian"
+        ],
+        "count": [38, 30, 27, 27, 23, 22, 20, 16, 12, 11],
+        "total": [568, 512, 356, 419, 328, 393, 224, 206, 293, 147]
+    })
+
+    df_per["percentage"] = (df_per["count"] / df_per["total"] * 100).round()
+
+    print(df_per[["genre", "percentage"]])
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Based on this percentage i can tell that:
+    - `world, ambient and arabic` genres are most of the time acctually less popular than other
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Here are mean params of worst errors
+    """)
     return
 
 
 @app.cell
 def _(df_worst):
-    df_worst.groupby(by='playlist_genre').agg({
+    df_worst.agg({
             'track_popularity':'mean',
             'energy':'mean',
             'danceability':'mean',
-            'playlist_genre':'count',
             'loudness':'mean',
             'liveness':'mean',
             'valence':'mean',
             'tempo':'mean',
             'duration_ms':'mean'
         })
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    All of the values are in the normal range of boxplot (based on eda.py)
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Feature importance
+    """)
+    return
+
+
+@app.cell
+def _():
     return
 
 
