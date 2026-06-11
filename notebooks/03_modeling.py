@@ -330,8 +330,10 @@ def _(
             artifact_path="best_lgbm"
         )
 
+        run = mlflow.active_run()
+        assert run is not None
         mlflow.register_model(
-            model_uri=f"runs:/{mlflow.active_run().info.run_id}/best_lgbm",
+            model_uri=f"runs:/{run.info.run_id}/best_lgbm",
             name="LightGBM-spotify"
         )
     return (y_pred,)
