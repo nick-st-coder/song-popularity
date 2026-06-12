@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.23.6"
+__generated_with = "0.23.9"
 app = marimo.App()
 
 
@@ -516,9 +516,59 @@ def _(X_test_preprocessed, shap, shap_values):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Here's what impacts the model the most:
+    - `is_popular_genre`, when it's `False`, being the strongest categorical feature in this dataset
+
+    - The second longest bar is `loudness`, which is the primary numeric feature in the dataset
+    - Then `scandinavian and modern` subgenres are playing notable role in model decision-making process
+    - Genres like `world and pop` are also have impact on model (especially world genre)
+    - `Year of release and instrumentalness` are last numeric features on top 3 most important ones
+    - `energy and duration` of the song are the last features that have over 1.0 shap values and still have some impact on output
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
 @app.cell
 def _(X_test_preprocessed, shap, shap_values):
     shap.summary_plot(shap_values, X_test_preprocessed)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Conclusions:
+    - When it's `not popular genre` (rock, pop, hip-hop) popularity `decreases`
+
+    - When music is `loud` -> it's `more popular`
+
+    - `Scandinavic` subgenre just like `arabic, latin and nordic` music has negative impact on output -> regional music `will not be popular`
+
+    - While on the other side we have `modern and reggaeton` music subgenres, they seem to have `good impact` on output
+
+    - `Old or instrumental` music is `less popular`
+
+    - The most impactful genre is `pop` which has `positive impact`
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
     return
 
 
@@ -534,6 +584,41 @@ def _(X_test_preprocessed, explainer, shap, shap_values):
     ))
 
     plt.show()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ##### Negative Impacts:
+    - playlist_genre_soca = 1: This had the largest impact, dropping the score by -9.78
+    - is_popular_genre_False = 1: Reduced the score by -2.06.
+    - playlist_subgenre_carnival = 1: Reduced the score by -1.65.
+    - playlist_subgenre_modern = 0: Reduced the score by -1.32.
+    - numeric__energy = 0.943: High energy reduced the score by -1.17.
+
+    ##### Positive Impacts:
+    - numeric__loudness = -4.474: Increased the score by +3.79.
+    - playlist_genre_world = 0: Increased the score by +1.1.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    - Expected output is `55.053`, but final is `42.942`. So features combined lower the prediction by `12.11 from baseline`
+
+    - The test song, on which it was evaluated -> belongs to the Soca genre and Carnival subgenre and doesn't belong to a popular genre or the modern subgenre either. It has high energy (0.943), high loudness (-4.474 dB), and is about 3.8 minutes long.It was released in November.
+    """)
     return
 
 
