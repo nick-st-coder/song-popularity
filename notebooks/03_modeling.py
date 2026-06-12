@@ -486,6 +486,54 @@ def _(mo):
 
 @app.cell
 def _():
+    import shap 
+
+    return (shap,)
+
+
+@app.cell
+def _(X_test, best_model):
+    X_test_preprocessed = best_model.named_steps['preprocess'].transform(X_test)
+    lgbm_model = best_model.named_steps['model']
+    return X_test_preprocessed, lgbm_model
+
+
+@app.cell
+def _(lgbm_model, shap):
+    explainer = shap.TreeExplainer(lgbm_model)
+    return (explainer,)
+
+
+@app.cell
+def _(X_test_preprocessed, explainer):
+    shap_values = explainer.shap_values(X_test_preprocessed)
+    return (shap_values,)
+
+
+@app.cell
+def _(X_test_preprocessed, shap, shap_values):
+    shap.summary_plot(shap_values, X_test_preprocessed, plot_type='bar')
+    return
+
+
+@app.cell
+def _(X_test_preprocessed, shap, shap_values):
+    shap.summary_plot(shap_values, X_test_preprocessed)
+    return
+
+
+@app.cell
+def _(X_test_preprocessed, explainer, shap, shap_values):
+    import matplotlib.pyplot as plt
+
+    shap.plots.waterfall(shap.Explanation(
+        values=shap_values[0],
+        base_values=explainer.expected_value,
+        data=X_test_preprocessed.iloc[0],
+        feature_names=X_test_preprocessed.columns
+    ))
+
+    plt.show()
     return
 
 
