@@ -688,5 +688,37 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    The final model achieved an `RMSE of 10.55`, indicating that predicted popularity scores differ from actual values by approximately `10.5` points on average.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    But still those results aren't fully accurate, because many factors can not be predicted (such as marketing (succesful / ot not), recommendation algorithm, artist reputstion etc.) and it's limits predicting perfomance of model.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
 if __name__ == "__main__":
     app.run()
