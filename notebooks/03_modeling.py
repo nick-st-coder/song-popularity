@@ -617,7 +617,7 @@ def _(mo):
     mo.md(r"""
     - Expected output is `55.053`, but final is `42.942`. So features combined lower the prediction by `12.11 from baseline`
 
-    - The test song, on which it was evaluated -> belongs to the Soca genre and Carnival subgenre and doesn't belong to a popular genre or the modern subgenre either. It has high energy (0.943), high loudness (-4.474 dB), and is about 3.8 minutes long.It was released in November.
+    - The test song, on which it was evaluated -> belongs to the `Soca genre and Carnival subgenre` and `doesn't belong to a popular genre` or the `modern subgenre` either. It has `high energy` (0.943), `high loudness (-4.474 dB)`, and is about `3.8 minutes` long.It was released `in November`.
     """)
     return
 
@@ -633,17 +633,9 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### `SUMMARY`
+    ### `SUMMARY`
 
-    I compared tuned model with its baseline and rf baseline and this is conclusions that i can make based on that
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ---
+    Based on mlflow comparing models here are the conclusions:
     """)
     return
 
@@ -680,6 +672,18 @@ def _(mo):
 def _(mo):
     mo.md(r"""
     ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    After comparing `eda hypotheses` with actual results, model confirms that:
+
+    - `Loudness` increases `popularity`
+
+    - `Liveness` and `acousticness` have no impact on results
     """)
     return
 
