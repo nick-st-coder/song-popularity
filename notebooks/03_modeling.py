@@ -679,11 +679,15 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    After comparing `eda hypotheses` with actual results, model confirms that:
+    The final model achieved an `RMSE of 10.55`, indicating that predicted popularity scores differ from actual values by approximately `10.5` points on average.
+    """)
+    return
 
-    - `Loudness` increases `popularity`
 
-    - `Liveness` and `acousticness` have no impact on results
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    But still those results aren't fully accurate, because many factors can not be predicted (such as marketing (succesful / ot not), recommendation algorithm, artist reputstion etc.) and it's limits predicting perfomance of model.
     """)
     return
 
@@ -699,15 +703,11 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    The final model achieved an `RMSE of 10.55`, indicating that predicted popularity scores differ from actual values by approximately `10.5` points on average.
-    """)
-    return
+    After comparing `eda hypotheses` with actual results, model confirms that:
 
+    - `Loudness` increases `popularity`
 
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    But still those results aren't fully accurate, because many factors can not be predicted (such as marketing (succesful / ot not), recommendation algorithm, artist reputstion etc.) and it's limits predicting perfomance of model.
+    - `Liveness` and `acousticness` have no impact on results
     """)
     return
 
