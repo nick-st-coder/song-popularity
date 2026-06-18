@@ -6,9 +6,9 @@ app = marimo.App()
 
 @app.cell
 def _():
-    import os
-    import sys
+    import os, sys, optuna, mlflow, shap
     import pandas as pd
+    import joblib as jl
 
     from sklearn.preprocessing import OneHotEncoder, StandardScaler
     from sklearn.pipeline import Pipeline
@@ -18,9 +18,6 @@ def _():
     from sklearn.ensemble import RandomForestRegressor
     from sklearn.metrics import root_mean_squared_error
     from lightgbm import LGBMRegressor
-
-    import optuna
-    import mlflow
 
     return (
         ColumnTransformer,
@@ -35,6 +32,7 @@ def _():
         os,
         pd,
         root_mean_squared_error,
+        shap,
         sys,
         train_test_split,
     )
@@ -357,7 +355,6 @@ def _(mo):
 
 @app.cell
 def _():
-    import joblib as jl
     # jl.dump(best_model, "../models/best_lgbm.pkl")
     return
 
@@ -482,13 +479,6 @@ def _(mo):
     Feature importance
     """)
     return
-
-
-@app.cell
-def _():
-    import shap 
-
-    return (shap,)
 
 
 @app.cell
