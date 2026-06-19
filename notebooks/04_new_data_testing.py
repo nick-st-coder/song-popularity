@@ -17,7 +17,7 @@ def _():
     from sklearn.impute import SimpleImputer
     from sklearn.model_selection import train_test_split
 
-    return jl, os, pd, shap, sys, train_test_split
+    return jl, os, pd, sys, train_test_split
 
 
 @app.cell
@@ -107,46 +107,6 @@ def _(mo):
     mo.md(r"""
     ---
     """)
-    return
-
-
-@app.cell
-def _(X_test, best_model):
-    model  = best_model.named_steps['model']
-    X_test_preprocessed = best_model.named_steps['preprocess'].transform(X_test)
-    return X_test_preprocessed, model
-
-
-@app.cell
-def _(X_test_preprocessed, model, shap):
-    explainer = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(X_test_preprocessed)
-    return explainer, shap_values
-
-
-@app.cell
-def _(X_test_preprocessed, best_model, shap, shap_values):
-    shap.summary_plot(shap_values, X_test_preprocessed, 
-    plot_type='bar', feature_names=best_model.named_steps['preprocess'].get_feature_names_out())
-    return
-
-
-@app.cell
-def _(X_test_preprocessed, best_model, shap, shap_values):
-    shap.summary_plot(shap_values, X_test_preprocessed, feature_names=best_model.named_steps['preprocess'].get_feature_names_out())
-    return
-
-
-@app.cell
-def _(X_test_preprocessed, explainer, shap, shap_values):
-    shap.plots.waterfall(
-        shap.Explanation(
-            shap_values[0],
-            explainer.expected_value,
-            data=X_test_preprocessed.iloc[0],
-            feature_names=X_test_preprocessed.columns
-        )
-    )
     return
 
 
