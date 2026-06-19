@@ -17,7 +17,7 @@ def _():
     from sklearn.impute import SimpleImputer
     from sklearn.model_selection import train_test_split
 
-    return jl, os, pd, sys, train_test_split
+    return jl, os, pd, shap, sys, train_test_split
 
 
 @app.cell
@@ -63,7 +63,7 @@ def _(X, train_test_split, y):
 
 @app.cell
 def _(X_test):
-    new_songs = X_test.sample(5)
+    new_songs = X_test.sample(5, random_state=31)
     return (new_songs,)
 
 
@@ -96,17 +96,47 @@ def _(new_songs):
     return
 
 
-@app.cell
-def _(best_model, new_songs):
-    best_model.predict(new_songs)
-    return
-
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     ---
     """)
+    return
+
+
+@app.cell
+def _(best_model, new_songs):
+    model = best_model.named_steps['model']
+    sample_preprocessed = best_model.named_steps['preprocess'].transform(new_songs)
+    return model, sample_preprocessed
+
+
+@app.cell
+def _(model, sample_preprocessed, shap):
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(sample_preprocessed)
+    return (shap_values,)
+
+
+@app.cell
+def _(best_model, sample_preprocessed, shap, shap_values):
+    shap.summary_plot(
+        shap_values,
+        sample_preprocessed,
+        plot_type='bar',
+        feature_names=best_model.named_steps['preprocess'].get_feature_names_out()
+    )
+    return
+
+
+@app.cell
+def _():
+    # for i in range(len(new_songs)):
+    #     shap.force_plot(
+    #         explainer.expected_value,
+    #         shap_values[i],
+    #         new_songs[i]
+    #     )
     return
 
 
