@@ -623,9 +623,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### `SUMMARY`
-
-    Based on mlflow comparing models here are the conclusions:
+    ## `SUMMARY`
     """)
     return
 
@@ -706,6 +704,24 @@ def _(mo):
 def _(mo):
     mo.md(r"""
     ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Answering first question: `Can we estimate a song's popularity from its audio characteristics?`
+
+    - `YES` you can estimate a song's popularity
+
+    And here's patterns that i noticed, while working on this project:
+    - `pop` genre obviously is the key to popularity
+    - it has to be `modern` and `not too long`
+    - it `can't be regional` -> english speaking artist
+    - would be nice if it's `energetic, loud and positive` but balanced
+    - most of users don't care about concerts -> `perfomance-based music isn't good idea`
+    - `do not` create `instrumental` songs -> it decreases popularity drastically
     """)
     return
 
