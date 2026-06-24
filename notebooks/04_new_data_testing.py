@@ -115,7 +115,7 @@ def _(best_model, new_songs):
 def _(model, sample_preprocessed, shap):
     explainer = shap.TreeExplainer(model)
     shap_values = explainer.shap_values(sample_preprocessed)
-    return (shap_values,)
+    return explainer, shap_values
 
 
 @app.cell
@@ -130,13 +130,21 @@ def _(best_model, sample_preprocessed, shap, shap_values):
 
 
 @app.cell
-def _():
-    # for i in range(len(new_songs)):
-    #     shap.force_plot(
-    #         explainer.expected_value,
-    #         shap_values[i],
-    #         new_songs[i]
-    #     )
+def _(
+    best_model,
+    explainer,
+    new_songs,
+    sample_preprocessed,
+    shap,
+    shap_values,
+):
+    for i in range(len(new_songs)):
+        shap.waterfall_plot(shap.Explanation(
+            values=shap_values[i],
+            base_values=explainer.expected_value,
+            data=sample_preprocessed[i],
+            feature_names=best_model.named_steps['preprocess'].get_feature_names_out()
+        ))
     return
 
 
