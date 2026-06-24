@@ -63,7 +63,7 @@ def _(X, train_test_split, y):
 
 @app.cell
 def _(X_test):
-    new_songs = X_test.sample(5, random_state=31)
+    new_songs = X_test.sample(5, random_state=33)
     return (new_songs,)
 
 
@@ -119,17 +119,6 @@ def _(model, sample_preprocessed, shap):
 
 
 @app.cell
-def _(best_model, sample_preprocessed, shap, shap_values):
-    shap.summary_plot(
-        shap_values,
-        sample_preprocessed,
-        plot_type='bar',
-        feature_names=best_model.named_steps['preprocess'].get_feature_names_out()
-    )
-    return
-
-
-@app.cell
 def _(
     best_model,
     explainer,
@@ -145,6 +134,35 @@ def _(
             data=sample_preprocessed[i],
             feature_names=best_model.named_steps['preprocess'].get_feature_names_out()
         ))
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Conclusions:
+    - As predicted `pop` music doing well with popularity
+    - `Blues` increases value on almost the same amount as `pop`
+    - `Regional` or `Mood-depend` music is not popular (e.g. French / Mediative)
+    - Extremely `quiet` songs are not popular either
+    - `is_popular_genre` most of the time impacts final output the most
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
     return
 
 
